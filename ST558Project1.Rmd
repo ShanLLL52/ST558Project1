@@ -266,10 +266,6 @@ GetdayoneLive <- function(country, status, live = TRUE){
 }
 ```
 
-sa <- Getdayone('south-africa', 'confirmed')
-saL <- GetdayoneLive('south-africa','confirmed', TRUE)
-saNL <- GetdayoneLive('south-africa','confirmed',FALSE)
-
 `GetdayoneTotal`  
 
 This function returns a data.frame for total cases by case type for a country from the first recorded case. The default setting is to return total cases for all case types for a country. A specific country are requuired.  
@@ -327,6 +323,7 @@ GetdayoneTotal <- function(country, status = 'all'){
 `covidAPI`  
 
 This function is a wrapper function for all the others above. You simply pass the name of the function you want to use, and any additional arguments for that function.  
+
 ```{r covidAPI, echo=TRUE, eval=TRUE}
 covidAPI <- function(func, ...){
   ###
@@ -372,7 +369,7 @@ rl <- covidAPI('GetdayoneLive', 'china', 'recovered')
 
 Let's keep the variables that we are interested in, and keep cases until *2022-06-24T00:00:00Z*. After filtering the data, I combine them and reshape it for wide format for plotting use.  
 
-```{r filter data, echo=TRUE, eval=TRUE}
+```{r filter data, echo=TRUE, eval=TRUE, message=FALSE}
 # Filtering for confirmed type
 cl <- cl %>% group_by(Province) %>% 
   filter(Date == "2022-06-24T00:00:00Z") %>%
@@ -511,7 +508,7 @@ The density plot shows the similar trend of histogram. Most of provinces have de
 
 Let's make a scatter plots for confirmed and deaths case.  
 
-```{r scatterplot,echo=TRUE, eval=TRUE}
+```{r scatterplot,echo=TRUE, eval=TRUE, message=FALSE}
 # Scatter plot for Confirmed vs Deaths with trend line
 g <- ggplot(data = LStatusW, aes(x = confirmed, y = deaths))
 g + geom_point(aes(color = Province)) +
@@ -529,7 +526,7 @@ LStatusW %>% filter(deaths > 3000)
 
 Hubei and Hong Kong have large confirmed and deaths case. Hong Kong has extremely large confirmed case. Let's remove them and plot again.  
 
-```{r scatterplotnew, echo=TRUE, eval=TRUE}
+```{r scatterplotnew, echo=TRUE, eval=TRUE, message=FALSE}
 # Remove Hubei and Hong Kong
 LStatusWSC <- LStatusW %>% 
   filter(deaths < 3000)

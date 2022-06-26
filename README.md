@@ -270,10 +270,6 @@ GetdayoneLive <- function(country, status, live = TRUE){
 }
 ```
 
-sa \<- Getdayone(‘south-africa’, ‘confirmed’) saL \<-
-GetdayoneLive(‘south-africa’,‘confirmed’, TRUE) saNL \<-
-GetdayoneLive(‘south-africa’,‘confirmed’,FALSE)
-
 `GetdayoneTotal`
 
 This function returns a data.frame for total cases by case type for a
@@ -400,12 +396,6 @@ rl <- rl %>% group_by(Province) %>%
   select(Province, Cases, Status)
 # Combine all types into long format
 LStatusL <- full_join(cl, full_join(dl, rl))
-```
-
-    ## Joining, by = c("Province", "Cases", "Status")
-    ## Joining, by = c("Province", "Cases", "Status")
-
-``` r
 # Reshape long format to wide and creating a new variable called DeathRate for each provinces.
 LStatusW<- LStatusL %>% pivot_wider(id_cols = Province, 
                         names_from = Status,
@@ -631,8 +621,6 @@ g + geom_point(aes(color = Province)) +
        title = "Scatter Plot for Confirmed vs Deaths")
 ```
 
-    ## `geom_smooth()` using formula 'y ~ x'
-
 ![](README_files/figure-gfm/scatterplot-1.png)<!-- -->
 
 From the scatter plot, most of points are stick at the corner. It is
@@ -667,8 +655,6 @@ g + geom_point(aes(color = Province)) +
        y = "Deaths Case",
        title = "Scatter Plot for Confirmed vs Deaths")
 ```
-
-    ## `geom_smooth()` using formula 'y ~ x'
 
 ![](README_files/figure-gfm/scatterplotnew-1.png)<!-- -->
 
