@@ -17,7 +17,8 @@ The Following Packages are used in this project:
 
 [`tidyverse`](https://www.tidyverse.org)  
 [`jsonlite`](https://cran.r-project.org/web/packages/jsonlite/)  
-[`ggplot2`](https://ggplot2.tidyverse.org)
+[`ggplot2`](https://ggplot2.tidyverse.org)  
+[`knitr`](https://cran.r-project.org/web/packages/knitr/index.html)
 
 # API Interaction Functions
 
@@ -406,43 +407,43 @@ LStatusW<- LStatusL %>% pivot_wider(id_cols = Province,
 Let’s take look at both long and wide format data.
 
 ``` r
-LStatusL
+LStatusL %>% arrange(Status, Cases)
 ```
 
     ## # A tibble: 99 × 3
     ## # Groups:   Province [33]
-    ##    Province     Cases Status   
-    ##    <chr>        <int> <chr>    
-    ##  1 Xinjiang      1008 confirmed
-    ##  2 Shandong      2749 confirmed
-    ##  3 Shanxi         423 confirmed
-    ##  4 Chongqing      726 confirmed
-    ##  5 Hunan         1401 confirmed
-    ##  6 Beijing       3674 confirmed
-    ##  7 Tibet            1 confirmed
-    ##  8 Guizhou        185 confirmed
-    ##  9 Jiangxi       1386 confirmed
-    ## 10 Heilongjiang  2987 confirmed
+    ##    Province  Cases Status   
+    ##    <chr>     <int> <chr>    
+    ##  1 Tibet         1 confirmed
+    ##  2 Ningxia     122 confirmed
+    ##  3 Macau       125 confirmed
+    ##  4 Qinghai     147 confirmed
+    ##  5 Guizhou     185 confirmed
+    ##  6 Hainan      288 confirmed
+    ##  7 Shanxi      423 confirmed
+    ##  8 Gansu       681 confirmed
+    ##  9 Chongqing   726 confirmed
+    ## 10 Xinjiang   1008 confirmed
     ## # … with 89 more rows
 
 ``` r
-LStatusW
+LStatusW %>% arrange(confirmed, deaths)
 ```
 
     ## # A tibble: 33 × 5
     ## # Groups:   Province [33]
-    ##    Province     confirmed deaths recovered DeathRate
-    ##    <chr>            <int>  <int>     <int>     <dbl>
-    ##  1 Xinjiang          1008      3         0    0.298 
-    ##  2 Shandong          2749      7         0    0.255 
-    ##  3 Shanxi             423      0         0    0     
-    ##  4 Chongqing          726      6         0    0.826 
-    ##  5 Hunan             1401      4         0    0.286 
-    ##  6 Beijing           3674      9         0    0.245 
-    ##  7 Tibet                1      0         0    0     
-    ##  8 Guizhou            185      2         0    1.08  
-    ##  9 Jiangxi           1386      1         0    0.0722
-    ## 10 Heilongjiang      2987     13         0    0.435 
+    ##    Province  confirmed deaths recovered DeathRate
+    ##    <chr>         <int>  <int>     <int>     <dbl>
+    ##  1 Tibet             1      0         0     0    
+    ##  2 Ningxia         122      0         0     0    
+    ##  3 Macau           125      0         0     0    
+    ##  4 Qinghai         147      0         0     0    
+    ##  5 Guizhou         185      2         0     1.08 
+    ##  6 Hainan          288      6         0     2.08 
+    ##  7 Shanxi          423      0         0     0    
+    ##  8 Gansu           681      2         0     0.294
+    ##  9 Chongqing       726      6         0     0.826
+    ## 10 Xinjiang       1008      3         0     0.298
     ## # … with 23 more rows
 
 # Exploratory Data Analysis
@@ -453,7 +454,7 @@ Let’s create numeric summary table.
 
 ``` r
 # Numeric Summaries
-LStatusL %>% 
+NSumm <- LStatusL %>% 
   group_by(Status) %>% 
   summarise(
     Min    = round(min(Cases), digits = 0),
@@ -462,14 +463,14 @@ LStatusL %>%
     Median = round(median(Cases), digits = 0),
     IQR    = round(IQR(Cases), digits = 0),
     Max    = round(max(Cases), digits = 0))
+kable(NSumm)
 ```
 
-    ## # A tibble: 3 × 7
-    ##   Status      Min   Avg     Sd Median   IQR     Max
-    ##   <chr>     <dbl> <dbl>  <dbl>  <dbl> <dbl>   <dbl>
-    ## 1 confirmed     1 44236 214262   2007  2457 1234166
-    ## 2 deaths        0   443   1790      3     6    9398
-    ## 3 recovered     0     0      0      0     0       0
+| Status    | Min |   Avg |     Sd | Median |  IQR |     Max |
+|:----------|----:|------:|-------:|-------:|-----:|--------:|
+| confirmed |   1 | 44236 | 214262 |   2007 | 2457 | 1234166 |
+| deaths    |   0 |   443 |   1790 |      3 |    6 |    9398 |
+| recovered |   0 |     0 |      0 |      0 |    0 |       0 |
 
 From the table, none of provinces have any recovered case. A few
 provinces have no deaths case, and all provinces absolutely have
@@ -506,16 +507,16 @@ total number of province, and create table.
 # Remove the observations with 0 case
 LStatusLNot0 <- LStatusL %>% filter( Cases != 0)
 # Contingency Table
-LStatusLNot0 %>% 
+CT <- LStatusLNot0 %>% 
   group_by(Status) %>% 
   summarise(count = n()) %>%
   pivot_wider(names_from = Status, values_from = count)
+kable(CT)
 ```
 
-    ## # A tibble: 1 × 2
-    ##   confirmed deaths
-    ##       <int>  <int>
-    ## 1        33     27
+| confirmed | deaths |
+|----------:|-------:|
+|        33 |     27 |
 
 From the contingency table, all provinces have confirmed case, and 27
 provinces have deaths case. None provinces have any recovered case which

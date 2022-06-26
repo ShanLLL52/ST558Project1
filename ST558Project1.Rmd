@@ -2,7 +2,6 @@
 title: "ST558 Project1"
 author: "Shan Luo"
 date: '2022-06-26'
-output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -10,6 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(jsonlite)
 library(tidyverse)
 library(ggplot2)
+library(knitr)
 ```
 
 ```{r render, echo=TRUE, eval=FALSE}
@@ -27,6 +27,7 @@ The Following Packages are used in this project:
 [`tidyverse`](https://www.tidyverse.org)  
 [`jsonlite`](https://cran.r-project.org/web/packages/jsonlite/)   
 [`ggplot2`](https://ggplot2.tidyverse.org)  
+[`knitr`](https://cran.r-project.org/web/packages/knitr/index.html)  
 
 # API Interaction Functions  
 
@@ -394,8 +395,8 @@ LStatusW<- LStatusL %>% pivot_wider(id_cols = Province,
 Let's take look at both long and wide format data.  
 
 ```{r data, echo=TRUE,eval=TRUE}
-LStatusL
-LStatusW
+LStatusL %>% arrange(Status, Cases)
+LStatusW %>% arrange(confirmed, deaths)
 ```
 
 # Exploratory Data Analysis  
@@ -406,7 +407,7 @@ Let's create numeric summary table.
 
 ```{r Numeric Summaries, echo=TRUE, eval=TRUE}
 # Numeric Summaries
-LStatusL %>% 
+NSumm <- LStatusL %>% 
   group_by(Status) %>% 
   summarise(
     Min    = round(min(Cases), digits = 0),
@@ -415,6 +416,7 @@ LStatusL %>%
     Median = round(median(Cases), digits = 0),
     IQR    = round(IQR(Cases), digits = 0),
     Max    = round(max(Cases), digits = 0))
+kable(NSumm)
 ```
 
 From the table, none of provinces have any recovered case. A few provinces have no deaths case, and all provinces absolutely have confirmed case. The confirmed and deaths type have unusual numeric summaries, which may caused by some outliers.  
@@ -443,10 +445,11 @@ Let's remove all observations with 0 case for each case type, count total number
 # Remove the observations with 0 case
 LStatusLNot0 <- LStatusL %>% filter( Cases != 0)
 # Contingency Table
-LStatusLNot0 %>% 
+CT <- LStatusLNot0 %>% 
   group_by(Status) %>% 
   summarise(count = n()) %>%
   pivot_wider(names_from = Status, values_from = count)
+kable(CT)
 ```
 
 From the contingency table, all provinces have confirmed case, and 27 provinces have deaths case. None provinces have any recovered case which is same as the summary table.  
